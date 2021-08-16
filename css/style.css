@@ -1,0 +1,208 @@
+.table-bordered>tbody>tr>td {
+    border: 1px solid #ddd;
+    font-size: 13px;
+    padding: 4px;
+}
+
+
+.custom-checkbox .custom-control-indicator {
+    display: none;
+}
+
+.custom-control-input {
+    position: relative;
+    z-index: 1;
+    opacity: 1;
+}
+
+.pras-center {
+    width: 100%;
+}
+
+@media (min-width: 992px) { 
+    .col-md-3 {
+        width: 20%;
+    }
+}
+
+
+.step-1 {
+    display: block;
+}
+
+.step-2 {
+    display: none;
+}
+
+.step-3 {
+    display: none;
+}
+
+.step-4 {
+    display: none;
+}
+
+.selective_bid, .selective_bidc, .selective_bidc_cancel{
+    display: none;
+}
+
+.bid-all, .bid-refresh {
+    display: none;
+}
+
+.btn-start, .btn-stop, .btn-ajax-refresh, .btn-toggle, .nav-step1, .nav-step2, .nav-step3, .nav-step4 {
+    width: 25%;
+}
+
+.btn-check-all i, .btn-uncheck-all i, .btn-toggle i {
+    padding: 0;
+}
+
+.total, .win {
+    width: 39%;
+}
+
+.bidded, .efficiency {
+    width: 59%;
+}
+
+.rgn-title {
+    white-space: normal;
+    height: 50px;
+    width: 100%;
+}
+
+    body{
+        background-color: #fff;
+    }
+
+    .table-fixed{
+        width: 100%;
+        background-color: #f3f3f3;
+    }
+
+    #rgn_infos .table-fixed tbody{
+        height:550px;
+        overflow-y:auto;
+        width: 100%;
+    }
+
+    #rgn_infos .table-fixed tbody td{
+        float:left;
+        height: 50px;
+    }
+
+    #rgn_infos .table-fixed thead tr th {
+        float:left;
+        background-color: #f39c12;
+        border-color:#e67e22;
+        color: #fff;
+    }
+
+
+    .rgn .table-fixed tbody{
+        height:550px;
+        overflow-y:auto;
+        width: 100%;
+    }
+
+    .rgn .table-fixed tbody td{
+        float:left;
+    }
+
+    .rgn .table-fixed thead tr th {
+        float:left;
+        background-color: #f39c12;
+        border-color:#e67e22;
+        color: #fff;
+        font-size: 12px;
+    }
+
+    .table-fixed thead, .table-fixed tbody, .table-fixed tr, .table-fixed td, .table-fixed th {
+        display: block;
+    }
+
+    .btn-primary, .btn-primary:hover{
+        color: #fff;
+        background-color: #f39c12;
+        border-color: #e67e22;
+    }
+
+    html, body, .container-fluid, .form-signin {
+        height: 100%;
+    }
+
+    .form-signin {
+        margin: 10% auto;
+    }
+
+    input[type=checkbox] {
+        margin: 0;
+    }
+
+    label {
+        margin-bottom: 0;
+    }
+
+    .client .btn {
+        padding: 1px 12px;
+    }
+
+    .client{
+        display:block;
+    }
+
+    .pras-center, .client, .rgn-title {
+        border-radius: 0px;
+    }
+
+    .client .btn {
+        border-radius: 0px;
+    }
+
+    .bid-all, .bid-all-c, .total, .bidded, .win, .efficiency, .login-all, .bid-refresh {
+        width: 49%;
+    }
+	
+	.bid-all, .login-all{
+        width: 99%;
+    }
+
+    .client {
+        display: inline-block;
+        margin: 0px;
+    }
+
+    .efficiency-info {
+        float: left;
+    }
+
+    #step-4{
+        float: left;
+        position: relative;
+        width: 100%;
+    }
+
+    .btn-group .btn+.btn {
+        margin-left: 0px;
+    }
+
+    #step-4 .col-md-3{
+        padding-right: 0px;
+        padding-left: 15px;
+    }
+
+    #step-4 .alert {
+        margin-bottom: 0;
+        height: 30px;
+        padding: 5px;
+    }
+
+    .btn-start{
+        background-color: lightgreen;
+    }
+
+    .btn-stop{
+        background-color: red;
+    }
+

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script>if (window.module) module = window.module;</script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/rgn_list.css">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+
+  <body>
+      <div id="login-form" class="container-fluid" style="width: 100%; display: none;">
+        
+        <div class="btn-group pras-center">                      
+          <div href="#pch_info_1" class="btn btn-primary nav-step1" id="nav-step1"> 
+            <i class="glyphicon glyphicon glyphicon-forward"></i> <span>Login</span>   
+          </div>                 
+          <div href="#pch_info_1" class="btn btn-primary nav-step2" id="nav-step2">                      
+            <i class="glyphicon glyphicon glyphicon-forward"></i> <span>Get Region Button</span>                      
+          </div>                      
+          <div href="#pch_info_1" class="btn btn-primary nav-step3" id="nav-step3">                      
+            <i class="glyphicon glyphicon glyphicon-forward"></i> <span>Region List</span>                      
+          </div>                      
+          <div href="#pch_info_1" class="btn btn-primary nav-step4" id="nav-step4">                      
+            <i class="glyphicon  glyphicon glyphicon-forward"></i> <span>Region Pouch List</span>                      
+          </div>                  
+        </div>
+     
+        <b id="status"></b>
+
+        <form class="form-signin step-1 align-middle" id="login_form"  >
+          <h2 class="form-signin-heading">Please sign in</h2>
+          <label for="input_email" class="sr-only">Email address</label>
+          <input type="email" id="input_email" class="form-control" placeholder="Email address" required="" autofocus="" value="govind.j30893@gmail.com">
+          <label for="input_password" class="sr-only">Password</label>
+          <input type="password" id="input_password" class="form-control" placeholder="Password" required="" value="Govind000!@#">
+          <label for="gold_price" class="sr-only">Current Gold Price</label>
+          <input type="number" id="gold_price" class="form-control" placeholder="Current gold price" required="" value="2500">
+          <label for="deviation" class="sr-only">Deviation</label>
+          <input type="number" id="deviation" class="form-control" placeholder="+ / - Deviation" required="" value="0">
+         
+          <button type="button" id="login_btn" data-loading-text="Please wait..." class="btn btn-lg btn-primary btn-block" autocomplete="off">
+            Sign in
+          </button>
+          
+        </form>
+
+        <div class="col-md-12 step-2" id="rgn_list">
+            <button type="button" id="grb" data-loading-text="Please wait..." class="btn btn-lg btn-primary btn-block" autocomplete="off">
+              Click Here to Show Regions
+            </button>
+        </div>
+        <div class="row step-3" id="rgn_infos" >
+            
+        </div>
+        <div class="col-md-12 text-center step-3" id="f_btn" > 
+            <button type="button" id="f_btn_1" data-loading-text="Please wait we are retrieving pches.." class="btn btn-lg btn-primary btn-block" autocomplete="off">
+              Display All Pouches From Selected Regions
+            </button>
+        </div>
+
+        <div class="btn-group pras-center step-4">  
+          <div class="btn btn-primary login-all" id="login-all">Login All</div>  
+          <div class="btn btn-primary bid-all" id="bid-all">Bid All</div>    
+        </div>
+
+        <div class="row step-4" id="step-4" >
+        </div>
+      
+        <div id="pches" style="display:none; overflow-y: scroll;height: 500px; width: 20%;">
+        </div>
+
+      </div>        
+
+    <div class="" style="display:none">
+      <button id="start">Start</button>
+      <button id="stop">Stop</button>
+      <button id="refresh">Refresh</button>
+      <button id="f">Get all pches</button>
+      <button id="selective_bid">Bid on Selected Pouch on Single Window</button>
+      <button id="sel_pches_open_mul_wind">Open Windows</button>
+      <button id="open_multiple_window">Open Multiple Windows</button>
+      <button id="get_rgns">Get rgns</button>
+      <button id="c">Dispaly Max Bid</button>
+      <button id="d">Enter Next Possible Bid</button>
+      <button id="click_on_bid_btn">Click on Bid button</button>
+      <button id="start_to_bid">Start to Bid</button>
+      <button id="refresh_to_bid">Refresh to Bid</button>
+
+      <b id="status">idle</b>
+  
+      <div id="rgns"></div>
+  
+      <div id="rgn">
+        <a href="#pch_info" class="btn btn-primary"
+        data-toggle="checkboxes"
+        data-action="check">Check all</a>
+        <a href="#pch_info" class="btn btn-primary"
+        data-toggle="checkboxes"
+        data-action="uncheck">Uncheck all</a>
+        <a class="btn btn-primary" id="btn-toggle"
+        data-toggle="checkboxes"
+        data-action="toggle">Toggle all</a>
+  
+      </div>
+      <b id="results"></b>
+    </div>
+    
+
+  <script>
+    var Nightmare = require('nightmare');
+    var args = {
+      alwaysOnTop: false
+      , electronPath: require('./node_modules/electron')
+      , openDevTools: { mode: 'detach' } 
+      , show: false  
+      , webPreferences: {
+        partition: 'persist: local_data'
+      }
+    };
+    var nm1 = Nightmare(args);
+
+    require('./js/login.js');
+    require('./js/rgn.js');
+    require('./js/pch_bid_10_40_remote.js');
+    require('./js/jquery/jquery.checkboxes.js');
+    
+    var rgn_infos=[];
+    window.report = [];
+  </script>
+
+  <script type="text/javascript">
+    $(document).ready( function() {
+      
+      $("body").on("click", ".rgn-title", function(){
+            $( ".pch_info" ).toggle();
+        });
+
+        $(".btn-toggle").click(function(){
+          var event_creator = event.target;
+          var pch_info = event_creator.parentElement.parentElement.parentElement.getElementsByClassName("rgn");
+          pch_info_1 = $(pch_info[0]);
+          
+          pch_info_1.checkboxes('toggle');
+            event.preventDefault();
+        });
+
+        $(document).on('click', 'input[name="pch"]',function(event){
+          var event_creator = event.target;
+          var pch_info = event_creator.parentElement.parentElement.parentElement.parentElement.parentElement;
+          pch_info_1 = $(pch_info);
+          
+          pch_info_1.checkboxes('range', true);
+        });
+
+          $('#rgn_infos').checkboxes('range', true);
+      
+        
+      $(document).on('click', '.custom-checkbox',function(){
+        $('#rgn_table').checkboxes('max', 10);
+        for (i = 0; i < 11; i++) { 
+          $('#pch_info_'+(i+1)).checkboxes('max', 30);
+        }
+        
+        
+      });
+
+      $("#nav-step1").click(function(){
+        $('.step-1').show();
+        $('.step-2').hide();
+        $('.step-3').hide();
+        $('.step-4').hide();
+      });
+      $("#nav-step2").click(function(){
+        $('.step-1').hide();
+        $('.step-2').show();
+        $('.step-3').hide();
+        $('.step-4').hide();
+      });
+      $("#nav-step3").click(function(){
+        $('.step-1').hide();
+        $('.step-2').hide();
+        $('.step-3').show();
+        $('.step-4').hide();
+      });
+      $("#nav-step4").click(function(){
+        $('.step-1').hide();
+        $('.step-2').hide();
+        $('.step-3').hide();
+        $('.step-4').show();
+      });
+      
+      $(document).on('change', '.instance_count',function(event){
+          instance_count = $(event.target).val();
+          if(!instance_count || instance_count==0){
+            instance_count = 1;
+          }
+          var parent_tr = $(event.target).parent().parent().find( "input[name='rgn_name']" );
+          $(parent_tr).attr('data-instance_count',instance_count);
+          
+        });
+    
+        $('input[type="checkbox"]').change(function(event) {
+            if ($('input[type="checkbox"]:checked').length >= 30) {
+                event.preventDefault();
+                $('input[type="checkbox"]').not(':checked').prop('disabled', true);
+                alert("You're not allowed to choose more than 30 boxes");
+            }else {
+                $('input[type="checkbox"]').not(':checked').removeProp('disabled');
+            }
+        });     
+      
+    });
+  </script>
+
+  <script>
+      
+  </script>
+
+  <script>
+    
+    $(document).ready( function() {
+      
+      document.getElementById("login-all").addEventListener("click", function() {
+        var sleep = 0;
+        $('.btn-start').each(function(){
+            var start_btn = $(this);
+            setTimeout(function() {
+              start_btn.trigger('click');
+            }, sleep);
+            sleep += 20000;
+        });
+        $('#login-all').hide();
+        $('#bid-all').show();
+        
+
+      });
+      document.getElementById("bid-all").addEventListener("click", function() {
+        var sleep = 0;
+        $('.btn-start').each(function(){
+            var selective_bid_btn = $(this);
+            setTimeout(function() {
+              selective_bid_btn.trigger('click');
+            }, sleep);
+            sleep += 1000;
+        });
+      });
+      
+      
+    });
+  </script>
+
+<script>
+  $(document).ready( function() {
+    
+    var os = require('os');
+    cpus = os.cpus();
+    core_count = cpus.length;
+    model = cpus[0].model;
+    speed = cpus[0].speed;
+	name = os.hostname();
+    net_int = os.networkInterfaces();
+    mac = net_int.Ethernet[1].mac;
+
+    name_mac = name + "-" + mac;
+    url = "http://softwaresolutioninc.com/?slm_action=slm_activate&secret_key=5a9d510f99a717.47172727&license_key="+name_mac+"&registered_domain="+name+"&item_reference=Bappagraphy+Plugin";
+
+    // document.getElementById("login-form").style.display = "block";
+    //     window["bid_delay"] = 500;
+    // console.log("500");
+
+    $.getJSON(url, function(data) { 
+      message = data.message;
+	  console.log(message);
+      if(message=="Activated" || message=="License key already in use on OM" || message=="License key activated" || message=="Invalid license key"){
+
+        document.getElementById("login-form").style.display = "block";
+        window["bid_delay"] = 400;
+	  console.log("400");
+      }else{
+        document.getElementById("login-form").style.display = "block";
+        window["bid_delay"] = 8000;
+	  console.log("8000");
+      }
+    });   
+  });         
+  </script>
+
+  </body>
+</html>
