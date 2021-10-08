@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>Auction House</title>
     <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
     <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
@@ -36,9 +36,9 @@
         <form class="form-signin step-1 align-middle" id="login_form"  >
           <h2 class="form-signin-heading">Please sign in</h2>
           <label for="input_email" class="sr-only">Email address</label>
-          <input type="email" id="input_email" class="form-control" placeholder="Email address" required="" autofocus="" value="govind.j30893@gmail.com">
+          <input type="email" id="input_email" class="form-control" placeholder="Email address" required="" autofocus="" value="Lalitajadhav474@gmail.com">
           <label for="input_password" class="sr-only">Password</label>
-          <input type="password" id="input_password" class="form-control" placeholder="Password" required="" value="Govind000!@#">
+          <input type="password" id="input_password" class="form-control" placeholder="Password" required="" value="Gold@12345">
           <label for="gold_price" class="sr-only">Current Gold Price</label>
           <input type="number" id="gold_price" class="form-control" placeholder="Current gold price" required="" value="2500">
           <label for="deviation" class="sr-only">Deviation</label>
@@ -118,19 +118,24 @@
       alwaysOnTop: false
       , electronPath: require('./node_modules/electron')
       , openDevTools: { mode: 'detach' } 
-      , show: false  
+      , show: true 
       , webPreferences: {
         partition: 'persist: local_data'
       }
     };
     var nm1 = Nightmare(args);
-
+    var observer = new MutationObserver(function(mutations) {
+    for (mutation in mutations ){
+      console.log(mutation.target)
+      }
+    })
     require('./js/login.js');
     require('./js/rgn.js');
     require('./js/pch_bid_10_40_remote.js');
     require('./js/jquery/jquery.checkboxes.js');
     
     var rgn_infos=[];
+    window.observer = observer;
     window.report = [];
   </script>
 
@@ -217,11 +222,7 @@
       
     });
   </script>
-
-  <script>
-      
-  </script>
-
+  
   <script>
     
     $(document).ready( function() {
@@ -257,7 +258,6 @@
 
 <script>
   $(document).ready( function() {
-    
     var os = require('os');
     cpus = os.cpus();
     core_count = cpus.length;
@@ -265,33 +265,11 @@
     speed = cpus[0].speed;
     name = os.hostname();
     net_int = os.networkInterfaces();
-    // mac = net_int.Ethernet[1].mac;
-
-    // name_mac = name + "-" + mac;
-    // url = "http://softwaresolutioninc.com/?slm_action=slm_activate&secret_key=5a9d510f99a717.47172727&license_key="+name_mac+"&registered_domain="+name+"&item_reference=Bappagraphy+Plugin";
-
     document.getElementById("login-form").style.display = "block";
-        window["bid_delay"] = 400;
-    console.log("400");
-
-   //  $.getJSON(url, function(data) { 
-   //    message = data.message;
-	  // console.log(message);
-   //    if(message=="Activated" || message=="License key already in use on OM" || message=="License key activated" || message=="Invalid license key"){
-
-   //      document.getElementById("login-form").style.display = "block";
-   //      window["bid_delay"] = 400;
-	  // console.log("400");
-   //    }else{
-   //      document.getElementById("login-form").style.display = "block";
-   //      window["bid_delay"] = 8000;
-	  // console.log("8000");
-   //    }
-   //  });  
- 
+        window["bid_delay"] = 300;
     
-  });
-  </script>
+  }  )
+</script>
 
   </body>
 </html>

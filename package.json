@@ -23,6 +23,7 @@
   "dependencies": {
     "electron": "^1.8.1",
     "is-plain-object": "^2.0.4",
+    "nightmare": "^3.0.2",
     "vo": "^4.0.2"
   }
 }

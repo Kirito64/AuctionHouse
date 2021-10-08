@@ -48,6 +48,10 @@ if (shouldQuit) {
 
 app.on('ready', createWindow)
 
+app.on('console', (log, message)=>{
+  console.log(msg);
+})
+
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
     app.quit()

@@ -1,6 +1,3 @@
-
-
-
 const a = require('is-plain-object');
 var Nightmare = require('nightmare');
 var b = require('./extensions/b')
@@ -10,7 +7,7 @@ var vo = require('vo');
 var e = require('./extensions/e')
 var f = require('./extensions/f')
 var g = require('./extensions/g')
-
+var observer = require('./extensions/observer');
 
 b(Nightmare);
 c(Nightmare);
@@ -18,23 +15,48 @@ d(Nightmare);
 e(Nightmare);
 f(Nightmare);
 g(Nightmare);
+// observer(Nightmare);
 
+bidNotViable = [];
+
+(function(oldLog) {
+
+    console.log = function(arg) {
+        if (typeof arg === "string" && arg.indexOf("bidRank_") !== -1) {
+          var id = extractBidRank(arg);
+          console.log("Bidding on id " + id);
+          bid_on_change(id);
+        }
+
+        // now call original console.log() with original arguments
+        return oldLog.apply(console, arguments);
+    };
+})(console.log);
 
 pbc = 0
 bmwr1i = [];
+
+function extractBidRank(id){
+  var c = "bidRank_"
+  var extractedId = id.substring(c.length);
+  return (extractedId)
+}
 
 
 document.getElementById("grb").addEventListener("click", function(){
   $('#grb').button('loading')
 
   var run = function * () {
-      yield nm1
+      yield nm1.on('console', (log, msg)=>{
+        console.log(msg)
+      })
         //.goto('http://localhost/gold_auction/all_rgn_215/') 
         .goto('https://jewel-auction.procuretiger.com/AUCTION/') // change1 for jewel-auction.procuretiger.com
         .wait(2000)
         .inject("js", "./js/pch.js")
         .inject("js", "./js/rgn.js")
         .inject("js", "./js/cnty.js")
+
       var previousHeight = 0;
       var currentHeight = document.body.scrollHeight;
       while(previousHeight !== currentHeight) {
@@ -116,6 +138,7 @@ document.getElementById("f_btn_1").addEventListener("click", function(){
 
   });
 
+  window.pches1 = [];
   var run1 = function * () {
     var titles = [];
     var pches_html = "";
@@ -135,6 +158,7 @@ document.getElementById("f_btn_1").addEventListener("click", function(){
         .wait(2000)
         .f()
         .then(function (result) {
+          window.pches1.push({rgn_url: result})
           pches_html =pches_html + create_pch_asc_list_html(result.pches, section_no, rgn_url, selected_name[i]);
           })
 
@@ -176,7 +200,7 @@ $('body').on('click', '.btn-start', function(event) {
       }else {
           nightmare_obj = selective_bid_already_login(nightmare_obj, event, rgn_id, click_on_selected_bid_btns);
       }
-  })
+})
 
 });
 
@@ -209,6 +233,20 @@ function click_on_popup_yes_button(rgn_id, btn_id_index) {
     });
 }
 
+function click_on_popup_yes_button_auto(nightmare_obj, btn_id_index) {
+  nightmare_obj
+    .wait("#popup_ok")
+    .click("#popup_ok")
+    .wait("#popup_ok")
+    .click("#popup_ok")
+    .then(function () {
+      document.getElementById("pbc_rgn_"+rgn_id).innerHTML = "index: "+window["pbc_rgn_" + rgn_id] + ", " +"bid on pch no: "+btn_id_index ;
+    })
+    .catch(function (error) {
+    });
+}
+
+
 function intersect(bmwr1i, selected_pch_ids) {
   var temp;
   return selected_pch_ids.filter(function (e) {
@@ -234,7 +272,9 @@ function selective_bid_after_login(nightmare_obj, rgn_id, event, rgn_url){
     .inject("js", "./js/pch.js")
     .inject("js", "./js/rgn.js")
     .inject("js", "./js/cnty.js")
-
+    .wait(1000)
+    .f()
+    .then(res => console.log(res))
     .then(function (result) {
       $('#login_btn').button('reset')
       document.getElementById("login_form").style.display = "none";
@@ -242,7 +282,8 @@ function selective_bid_after_login(nightmare_obj, rgn_id, event, rgn_url){
     })
     .catch(function (error) {
       document.getElementById("status").innerHTML ='Error:', error;
-    });
+    })
+    ;
 }
 
 function selective_bid_login(nightmare_obj, rgn_id, event, rgn_url){
@@ -260,9 +301,67 @@ function selective_bid_login(nightmare_obj, rgn_id, event, rgn_url){
     .then(function(){
       document.getElementById("pbc_rgn_"+rgn_id).innerHTML = "User login for this region successfully." ;
       selective_bid_after_login(nightmare_obj, rgn_id, event, rgn_url);
-
-
     })
+}
+
+function bidViable(bid_id, nextbid){
+  var deviation = window["deviation"];
+  var startBid = document.getElementById("pch_"+bid_id+"_start").innerHTML;
+  if(nextbid<= startBid*(1 + deviation/100)){
+    return true;
+  }
+  else
+    return false
+  
+}
+
+function bid_on_change(bid_id){ 
+  var nightmare_obj = window["nightmare_rgn_1"]
+  var btnId = "#bid_"+bid_id;
+  var netammoutn = '#netBidAmt_'+bid_id;
+
+  nightmare_obj
+    .evaluate(
+      function(bid_id){
+        return parseInt(document.getElementById("bidRank_"+bid_id).innerHTML)
+      }, bid_id
+    ).then(function(bidRank){
+      var Rank = document.getElementById("pch_"+bid_id+"_start");
+      Rank.innerHTML = bidRank;
+    })
+    
+  if(bidViable(bid_id) && bidNotViable.indexOf(bid_id)!== -1)
+  {
+    var flag = 0;
+    nightmare_obj
+      .evaluate(function(netammoutn){
+        document.querySelector('input#txtcell_'+bid_id+'_18').value = ''
+        return parseInt(document.querySelector(netammoutn).innerHTML);
+      }, netammoutn)
+      .then(
+        function(result){
+        if(bidViable(bid_id, result)){
+          flag = 1;
+          nightmare_obj
+            .click('input#txtcell_'+bid_id+'_18')
+            .insert('input#txtcell_'+bid_id+'_18', result)
+            .wait(btnId)
+            .wait(window["bid_delay"])
+            .click(btnId)
+            .then(function(){
+              click_on_popup_yes_button_auto(nightmare_obj, bid_id);
+          })
+        }
+        else{
+            bidNotViable.append(bid_id)
+        }
+      })
+
+      if(flag){
+        var Rank = document.getElementById("pch_"+bid_id+"_start");
+        Rank.innerHTML = 1;
+      }
+  }
 }
 
 function get_rgn_info(event_creator){
@@ -276,11 +375,14 @@ function get_rgn_info(event_creator){
 
 function create_nightmare_instance(rgn_id, args){
   var nightmare_obj = window["nightmare_rgn_" + rgn_id];
+  console.log(rgn_id);
   if(typeof nightmare_obj == 'undefined') {
     window["nightmare_rgn_" + rgn_id] = Nightmare(args);
     window["pbc_rgn_" + rgn_id] = 0;
     nightmare_obj = window["nightmare_rgn_" + rgn_id];
-    nightmare_obj
+    nightmare_obj.on('console', (log, msg)=>{
+        console.log(msg)
+      })
     .goto('https://jewel-auction.procuretiger.com/AUCTION')
     .wait(1000)
   }
@@ -363,7 +465,6 @@ function click_on_selected_bid_btns(index, bmwr1i, rgn_id, area_ele) {
 
 function create_pch_asc_list_html (pches=[],rgn_no=0, rgn_url="", rgn_name="") {
   p_infos = "";
-
   not_bidded_count = 0;
   bidded_count = 0;
   win_count = 0;
@@ -398,7 +499,7 @@ function create_pch_asc_list_html (pches=[],rgn_no=0, rgn_url="", rgn_name="") {
   <tbody>';
   $.each( pches, function( key, value ) {
       var p_info = "\
-      <tr>\
+      <tr id = \"pch_"+(key+1)+"\">\
          <td  class=\"col-xs-3\" >\
           <label class=\"custom-control custom-checkbox\">\
               <input type=\"checkbox\" class=\"custom-control-input\" name=\"pch\" class=\"pch\" value=\""+value.sr_no+"\" value=\"Bike\">\
@@ -406,8 +507,8 @@ function create_pch_asc_list_html (pches=[],rgn_no=0, rgn_url="", rgn_name="") {
           </label>\
           </td>\
           <td  class=\"col-xs-2\" >"+value.sr_no+"</td>\
-          <td  class=\"col-xs-4 col-sm-4\" >"+value.start_price+"</td>\
-          <td  class=\"col-xs-3 col-sm-3\" >"+value.your_rank+"</td>\
+          <td  class=\"col-xs-4 col-sm-4\" id = \"pch_"+(key+1)+"\_start\">"+value.start_price+"</td>\
+          <td  class=\"col-xs-3 col-sm-3\"id = \"pch_"+(key+1)+"\_rank\" >"+value.your_rank+"</td>\
       </tr>";
 
       p_infos = p_infos+p_info;
@@ -428,7 +529,7 @@ function create_pch_asc_list_html (pches=[],rgn_no=0, rgn_url="", rgn_name="") {
   efficiency = efficiency.toFixed(0);
 
   p_infos_start="<div class=\"col-md-3\">";
-  efficiency_info = /* "<div class=\"efficiency-info\">\
+  efficiency_info =  "<div class=\"efficiency-info\">\
                         <div class=\"btn-group pras-center\">\
                           <div class=\"badge badge-danger client  total\">Total <span class=\"badge\">"+total_pches+"</span></div>\
                           <div class=\"badge badge-danger client bidded\">Bidded <span class=\"badge\">"+bidded_count+"</span></div>\
@@ -437,7 +538,7 @@ function create_pch_asc_list_html (pches=[],rgn_no=0, rgn_url="", rgn_name="") {
                           <div class=\"badge badge-danger client win\">Win <span class=\"badge\">"+win_count+"</span></div>\
                           <div class=\"badge badge-danger client efficiency\">Efficiency <span class=\"badge\">"+efficiency+"%</span></div>\
                         </div>\
-                      </div>"; */
+                      </div>"; 
 
 
   rgn_url_hidden = "<input type=\"hidden\"  class=\"rgn_url\" id=\"rgn_url_"+rgn_no+"\" value=\""+rgn_url+"\">";

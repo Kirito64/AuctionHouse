@@ -7,7 +7,7 @@ function cnty(rgns,gold_cost) {
     }
 
     this.get_rgns = function(){
-        return ["priyanka test"];
+        return this.rgns;
     }
 }
 
