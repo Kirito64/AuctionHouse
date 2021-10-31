@@ -15,19 +15,48 @@ d(Nightmare);
 e(Nightmare);
 f(Nightmare);
 g(Nightmare);
+
+
+class Queue {
+
+  constructor(){
+    this.bid = [];
+  }
+
+  enqueue(id){
+    this.bid.push(id);
+  }
+
+  dequeue(){
+    if(this.isEmpty())
+      return(-1)
+
+    return this.bid.shift();
+  }
+
+  isEmpty(){
+    return this.bid.length === 0;
+  }
+
+  search(id){
+    return this.bid.includes(id); 
+  }
+}
+
+const bids = new Queue();
 // observer(Nightmare);
 
 bidNotViable = [];
 
 (function(oldLog) {
 
-    console.log = function(arg) {
-        if (typeof arg === "string" && arg.indexOf("bidRank_") !== -1) {
+    console.log = async function(arg) {
+        if (typeof arg=== "string" && arg.indexOf("bidRank_") !== -1) {
           var id = extractBidRank(arg);
           console.log("Bidding on id " + id);
-          bid_on_change(id);
+          if(!bids.search(id) && !bidNotViable.includes(id))
+            bids.enqueue(id);
         }
-
         // now call original console.log() with original arguments
         return oldLog.apply(console, arguments);
     };
@@ -43,11 +72,17 @@ function extractBidRank(id){
 }
 
 
+
+
 document.getElementById("grb").addEventListener("click", function(){
   $('#grb').button('loading')
 
   var run = function * () {
-      yield nm1.on('console', (log, msg)=>{
+      yield nm1.on('console', async(log, msg)=>{
+        if (typeof msg=== "string" && msg.indexOf("bidRank_") !== -1){
+          var bid_id = extractBidRank(msg)
+          await bid_on_change(bid_id);
+        }
         console.log(msg)
       })
         //.goto('http://localhost/gold_auction/all_rgn_215/') 
@@ -306,8 +341,9 @@ function selective_bid_login(nightmare_obj, rgn_id, event, rgn_url){
 
 function bidViable(bid_id, nextbid){
   var deviation = window["deviation"];
-  var startBid = document.getElementById("pch_"+bid_id+"_start").innerHTML;
-  if(nextbid<= startBid*(1 + deviation/100)){
+  var startBid = parseInt(document.getElementById("pch_"+bid_id+"_start").innerHTML)
+  var max_bid_cost1 = startBid + (startBid/100*deviation); 
+  if(nextbid <= max_bid_cost1){
     return true;
   }
   else
@@ -315,54 +351,55 @@ function bidViable(bid_id, nextbid){
   
 }
 
-function bid_on_change(bid_id){ 
-  var nightmare_obj = window["nightmare_rgn_1"]
-  var btnId = "#bid_"+bid_id;
-  var netammoutn = '#netBidAmt_'+bid_id;
 
-  nightmare_obj
-    .evaluate(
-      function(bid_id){
-        return parseInt(document.getElementById("bidRank_"+bid_id).innerHTML)
-      }, bid_id
-    ).then(function(bidRank){
-      var Rank = document.getElementById("pch_"+bid_id+"_start");
-      Rank.innerHTML = bidRank;
-    })
-    
-  if(bidViable(bid_id) && bidNotViable.indexOf(bid_id)!== -1)
-  {
-    var flag = 0;
-    nightmare_obj
-      .evaluate(function(netammoutn){
-        document.querySelector('input#txtcell_'+bid_id+'_18').value = ''
-        return parseInt(document.querySelector(netammoutn).innerHTML);
-      }, netammoutn)
-      .then(
-        function(result){
-        if(bidViable(bid_id, result)){
-          flag = 1;
-          nightmare_obj
-            .click('input#txtcell_'+bid_id+'_18')
-            .insert('input#txtcell_'+bid_id+'_18', result)
-            .wait(btnId)
-            .wait(window["bid_delay"])
-            .click(btnId)
-            .then(function(){
-              click_on_popup_yes_button_auto(nightmare_obj, bid_id);
+const bidtimer = ()=>{
+
+  if(bids.isEmpty()){
+    return;
+  }
+  id = bids.dequeue();
+  bid_on_change(id);
+}
+
+setInterval(bidtimer,1500);
+
+
+const bid_on_change = (bid_id)=>{ 
+  var nightmare_obj = window["nightmare_rgn_1"];
+  var btnId = "#bid_"+bid_id
+  var netammoutn = 'netBidAmt_'+bid_id;
+
+  // var startAmt = nightmare_obj.evaluate((bid_id)=>{
+  //     return parseInt(document.getElementById("startPrice_"+bid_id).innerHTML);
+  // }, bid_id)
+
+
+
+  if(!bidNotViable.includes(bid_id)){
+    nightmare_obj.evaluate((netammoutn)=>{
+      return parseInt(document.getElementById(netammoutn).innerHTML)
+    }, netammoutn).then((result)=>{
+        // maxBid = startAmt + startAmt * window["deviation"]
+        // if(maxBid < result){
+        //   bidNotViable.push(bid_id)
+        //   return;
+        // }
+        nightmare_obj.evaluate((bid_id, nextbid)=>{
+          document.getElementById("txtcell_"+ bid_id+"_18").value = nextbid;
+        }, bid_id, result);
+
+
+        nightmare_obj.wait(btnId)
+          .wait(window["bid_delay"])
+          .click(btnId)
+          .then(()=>{
+            click_on_popup_yes_button_auto(nightmare_obj, bid_id)
           })
-        }
-        else{
-            bidNotViable.append(bid_id)
-        }
-      })
-
-      if(flag){
-        var Rank = document.getElementById("pch_"+bid_id+"_start");
-        Rank.innerHTML = 1;
-      }
+    })
   }
 }
+  
+
 
 function get_rgn_info(event_creator){
   var pch_info = event_creator.parentElement.parentElement.getElementsByClassName("rgn");

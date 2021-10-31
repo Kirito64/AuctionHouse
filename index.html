@@ -42,7 +42,7 @@
           <label for="gold_price" class="sr-only">Current Gold Price</label>
           <input type="number" id="gold_price" class="form-control" placeholder="Current gold price" required="" value="2500">
           <label for="deviation" class="sr-only">Deviation</label>
-          <input type="number" id="deviation" class="form-control" placeholder="+ / - Deviation" required="" value="0">
+          <input type="number" id="deviation" class="form-control" placeholder="+ / - Deviation" required="" value="6">
          
           <button type="button" id="login_btn" data-loading-text="Please wait..." class="btn btn-lg btn-primary btn-block" autocomplete="off">
             Sign in
@@ -118,7 +118,7 @@
       alwaysOnTop: false
       , electronPath: require('./node_modules/electron')
       , openDevTools: { mode: 'detach' } 
-      , show: true 
+      , show: true
       , webPreferences: {
         partition: 'persist: local_data'
       }

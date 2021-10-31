@@ -9,7 +9,6 @@ var observer = new MutationObserver(function (mutations){
         if(innerHtml !== 'Not bidded'){
             if(innerHtml != '1')
                 console.log(targe)
-                console.log(mutation)
         }
     }
 })
