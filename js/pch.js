@@ -1,9 +1,25 @@
+var observer = new MutationObserver(function (mutations){
+    i = 0;
+    for (i = 0; i<mutations.length; i++){
+
+        const mutation = mutations[i];
+        const targe = mutation.target.id
+        const innerHtml = mutation.target.innerHTML;
+
+        if(innerHtml !== 'Not bidded'){
+            if(innerHtml != '1')
+                console.log(targe)
+        }
+    }
+})
+var config ={ attributes: true, childList: true, characterData: true , subtree: true, };
+
 function Pouch(
     sr_no=0, acc_no=0, bank_id=0, bank_addr=""
     , wt_caret18=0, wt_caret19=0, wt_caret20=0, wt_caret21=0, wt_caret22=0, wt_caret23=0, wt_caret24=0
     , start_price=0, reserve_price=0, increment=0
     , h1bid=0, bid_rank=0, nxt_poss_bid=0
-    , gold_cost=2960
+    , gold_cost=2960,
     ) {
 
     this.sr_no = sr_no;
@@ -42,6 +58,10 @@ function Pouch(
     this.display = function(){
 
     }
+    this.setRank = function(rank){
+        this.bid_rank = rank;
+
+    }
 
 
     this.set_max_bid = function() {
@@ -56,6 +76,8 @@ function Pouch(
 }
 
 function PouchExtractor(pch={}, gold_cost=0, sr_no=0) {
+    
+    
     this.pch = pch;
     this.unique_id = sr_no;
     this.row_sel = "#rowid_"+this.unique_id;
@@ -68,12 +90,15 @@ function PouchExtractor(pch={}, gold_cost=0, sr_no=0) {
 
     this.h1bid_sel = "#h1l1Amount_"+this.unique_id;
     this.bid_rank_sel = "#bidRank_"+this.unique_id;
+    this.bid_rank_sel1 = 'bidRank_'+this.unique_id;
     this.nxt_poss_bid_sel = "#netBidAmt_"+this.unique_id;
 
     this.gold_cost = gold_cost;
-
     this.selector = ".table-border .m-bottom3";
     this.set_pch = function(){
+
+        
+
         var sr_no = $.trim($(this.row_sel).find(this.caret_sel+("_"+1)).text());
         var acc_no = $.trim($(this.row_sel).find(this.caret_sel+("_"+3+" a")).text());
         var bank_id = $.trim($(this.row_sel).find(this.caret_sel+("_"+6)).text());
@@ -93,8 +118,7 @@ function PouchExtractor(pch={}, gold_cost=0, sr_no=0) {
         var h1bid=$.trim($(this.details_sel).find(this.h1bid_sel).text());
         var bid_rank=$.trim($(this.details_sel).find(this.bid_rank_sel).text());
         var nxt_poss_bid=$.trim($(this.details_sel).find(this.nxt_poss_bid_sel).text());
-
-
+        console.log(bid_rank, sr_no)
         var next_possible_bid=$(this).find("#netBidAmt_"+(this.unique_id)).text();
         var pch_obj=new Pouch(
             sr_no, acc_no, bank_id, bank_addr
@@ -113,6 +137,7 @@ function PouchExtractor(pch={}, gold_cost=0, sr_no=0) {
 
         });
     }
+
 
     this.pches = [];
     this.insert_max_bid_cost_ele = function() {
@@ -241,11 +266,14 @@ function PouchExtractor(pch={}, gold_cost=0, sr_no=0) {
             var sr_no =$.trim($(this).find("#txtcell_"+(key+1)+"_1").text());
             var start_price_with_comma = $.trim($(this).find("#startPrice_"+(key+1)).text());
             var start_price = parseFloat($.trim($(this).find("#startPrice_"+(key+1)).text()).replace(/,/g,''));
+            // var next_possible_bid = parseFloat($.trim($(this).find("#netBidAmt_" +(key+1)).text()).replace(/,/g,'')); 
+            var bidRank = document.getElementById("bidRank_"+(key+1));
             start_price = Math.ceil(start_price);
-            var your_rank = $.trim($(this).find("#bidRank_"+(key+1)).text());
+            observer.observe(bidRank, config);
+            var your_rank = $.trim($(this).find("#bidRank_"+ (key+1)).text());
             if(isNaN(your_rank)){
                 your_rank="0";
-             }
+            }
             pch = {sr_no:sr_no, start_price:start_price, your_rank:your_rank,start_price_with_comma:start_price_with_comma};
             pches[key] = pch;
         });
@@ -261,7 +289,6 @@ function PouchExtractor(pch={}, gold_cost=0, sr_no=0) {
             var start_price = parseFloat($.trim($(this).find("#startPrice_"+(key+1)).text()).replace(/,/g,''));
             var h1_price_with_comma = $.trim($(this).find("#h1l1Amount_"+(key+1)).text());
             var h1_price = parseFloat($.trim($(this).find("#h1l1Amount_"+(key+1)).text()).replace(/,/g,''));
-            
             var is_above_max_bid = false;
             var background_color =$.trim($(this).find("#maxBid_"+(key+1)).css("background-color"));
             if(background_color=="rgb(255, 0, 0)") {
@@ -271,6 +298,7 @@ function PouchExtractor(pch={}, gold_cost=0, sr_no=0) {
             start_price = Math.ceil(start_price);
             h1_price = Math.ceil(h1_price);
             var your_rank = $.trim($(this).find("#bidRank_"+(key+1)).text());
+            console.log(this)
             if(isNaN(your_rank)){
                 your_rank="0";
              }
@@ -363,8 +391,23 @@ function PouchExtractor(pch={}, gold_cost=0, sr_no=0) {
 
 }
 
+
+
 sr_no = 1;
 var gold_price =  window["gold_price"];
-window.pch_extractor = new PouchExtractor({}, gold_price, sr_no); 
-
+window.pch_extractor = new PouchExtractor({}, gold_price, sr_no);
 pch_extractor.set_pch();
+var randomint = (min, max)=>{
+    return Math.floor(Math.random()* (max - min + 1)) + min ;
+
+}   
+
+var Testingmakechange = function(){
+    key = randomint(0, 85)
+    console.log(key)
+    var node = document.getElementById("bidRank_"+(key+1));
+    node.innerHTML += 1;
+
+}
+
+// var timer = setInterval(Testingmakechange, 1500)))``

@@ -47,7 +47,7 @@ function RegionExtractor(rgn={}, gold_cost, sr_no) {
                 bid_hall_link_sel = "tr:nth-child("+unique_id+") a:contains('View result')";
                 bid_hall_link = $.trim($(bid_hall_link_sel).attr("href"));
             }
-            basic_url = "https://jewel-auction.procuretiger.com";  // change1 for jewel-auction.procuretiger.com
+		basic_url = "https://jewel-auction.procuretiger.com";  // change1 for jewel-auction.procuretiger.com
             //basic_url = "http://localhost";
 
             bid_hall_link = basic_url + bid_hall_link;
